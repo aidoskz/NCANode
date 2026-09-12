@@ -1,5 +1,6 @@
 package kz.ncanode.service;
 
+import io.micrometer.observation.annotation.Observed;
 import kz.gov.pki.kalkan.asn1.ASN1Encodable;
 import kz.gov.pki.kalkan.asn1.ASN1EncodableVector;
 import kz.gov.pki.kalkan.asn1.DERSet;
@@ -44,6 +45,7 @@ public class TspService {
     private final CloseableHttpClient client;
     private final TspConfiguration tspConfiguration;
 
+    @Observed(name = "ncanode.tsp", contextualName = "tsp create")
     public TimeStampToken create(byte[] data, String hashAlg, String reqPolicy) {
         try {
             // Generate hash
@@ -156,6 +158,7 @@ public class TspService {
         }
     }
 
+    @Observed(name = "ncanode.tsp", contextualName = "tsp add to signer")
     public SignerInformation addTspToSigner(SignerInformation signer, X509Certificate cert, String useTsaPolicy) throws NoSuchAlgorithmException, NoSuchProviderException, TSPException, IOException {
         AttributeTable unsignedAttributes = signer.getUnsignedAttributes();
         ASN1EncodableVector vector = new ASN1EncodableVector();

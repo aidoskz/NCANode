@@ -1,5 +1,6 @@
 package kz.ncanode.service;
 
+import io.micrometer.observation.annotation.Observed;
 import kz.gov.pki.kalkan.asn1.ASN1InputStream;
 import kz.gov.pki.kalkan.asn1.DERObject;
 import kz.gov.pki.kalkan.asn1.DEROctetString;
@@ -48,6 +49,7 @@ public class OcspService {
      * @param issuer Сертификат удостоверяющего центра
      * @return
      */
+    @Observed(name = "ncanode.ocsp", contextualName = "ocsp verify")
     public List<OcspStatus> verify(CertificateWrapper cert, CertificateWrapper issuer) {
         List<OcspStatus> statuses = new ArrayList<>();
 
@@ -91,6 +93,7 @@ public class OcspService {
      * @param issuer сертификат издателя
      * @return список DER-кодированных {@code OCSPResponse} (может быть пустым)
      */
+    @Observed(name = "ncanode.ocsp", contextualName = "ocsp fetch")
     public List<byte[]> getRawResponses(CertificateWrapper cert, CertificateWrapper issuer) {
         final List<byte[]> responses = new ArrayList<>();
 

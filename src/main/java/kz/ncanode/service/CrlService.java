@@ -1,5 +1,6 @@
 package kz.ncanode.service;
 
+import io.micrometer.observation.annotation.Observed;
 import kz.ncanode.configuration.crl.CrlConfiguration;
 import kz.ncanode.dto.crl.CrlResult;
 import kz.ncanode.dto.crl.CrlStatus;
@@ -98,6 +99,7 @@ public class CrlService {
      * @param cert Сертификат
      * @return Статус проверки
      */
+    @Observed(name = "ncanode.crl", contextualName = "crl verify")
     public CrlStatus verify(CertificateWrapper cert) {
         if (!crlConfiguration.isEnabled()) {
             return CrlStatus.builder()
@@ -138,6 +140,7 @@ public class CrlService {
      * @param certificate сертификат, для которого нужны CRL
      * @return список DER-кодированных CRL (может быть пустым)
      */
+    @Observed(name = "ncanode.crl", contextualName = "crl fetch")
     public List<byte[]> getEncodedCrlsFor(X509Certificate certificate) {
         final List<byte[]> result = new ArrayList<>();
 

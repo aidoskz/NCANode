@@ -144,6 +144,33 @@ NCALayer `kz.gov.pki.ades` напрямую (бандлы `kalkan`/`ades`/`xmlds
 минуя баг pki.gov.kz с URL загрузки CRL); `VerifyXades.java` валидирует произвольный XAdES-XML этим же движком.
 Материал УЦ (fresh CRL, root) — `test.pki.gov.kz` / `crl.root.gov.kz`.
 
+## Observability (OpenTelemetry)
+
+Micrometer Observation → OpenTelemetry → OTLP. Приёмник любой, что умеет OTLP (Jaeger, Tempo,
+otel-collector, …) — Jaeger-специфичного кода нет, бэкенд меняется одним `NCANODE_TRACING_ENDPOINT`.
+Зависимости —
+`micrometer-tracing-bridge-otel` + `opentelemetry-exporter-otlp`, версии из Spring BOM. Выключено
+по умолчанию (`management.tracing.enabled=false`). Настройки — стандартные `management.tracing.*` /
+`management.otlp.tracing.*`, наружу как `NCANODE_TRACING_*`. Приёмник в `docker-compose.yml` намеренно
+не заводим — он поднимается отдельным `docker run` (см. README).
+
+Три источника span-ов:
+
+- **Серверные** — автоматически от Spring Boot. Плюс `@Scheduled`/`TaskScheduler`-задачи, поэтому
+  обновление кэша CA/CRL уходит отдельной трассой (`task ca-service.update-cache`).
+- **Сервисные** — `@Observed(name = "ncanode.<область>", contextualName = "<операция>")` на методах
+  для контроллеров и с внешним I/O. Аспект объявлен явно в `configuration/TracingConfiguration` и
+  **требует AspectJ**: `aspectjweaver` приезжает транзитивно из `spring-aspects`, уберёте его —
+  падение на старте с `NoAspectBoundException`. Самовызовы внутри бина не проксируются (потому
+  `CrlService.updateCache` и не аннотирован).
+- **Исходящие HTTP** — `wrapper/TracedHttpRequestExecutor` через `setRequestExecutor`: Micrometer сам
+  HttpClient 4.x не инструментирует, а CRL/OCSP/TSP/CA — самая долгая часть запроса. `SenderContext`
+  с `Kind.CLIENT`, поэтому уходит W3C `traceparent`.
+
+Служебные пути отсеивает `ObservationPredicate` (docker HEALTHCHECK ходит на `/actuator/health`
+каждые 20 секунд). Наблюдения дают и таймеры Micrometer, но `/actuator/metrics` наружу надо
+открывать отдельно — по умолчанию actuator отдаёт только `health`.
+
 ## Architecture
 
 Слои: **controller → service → wrapper**.

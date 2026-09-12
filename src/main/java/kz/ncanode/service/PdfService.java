@@ -1,5 +1,6 @@
 package kz.ncanode.service;
 
+import io.micrometer.observation.annotation.Observed;
 import kz.gov.pki.kalkan.jce.provider.KalkanProvider;
 import kz.gov.pki.kalkan.jce.provider.cms.*;
 import kz.gov.pki.kalkan.tsp.TimeStampToken;
@@ -56,6 +57,7 @@ public class PdfService {
 	 * @param pdfSignRequest PDF signing request
 	 * @return Signed PDF response
 	 */
+	@Observed(name = "ncanode.pdf", contextualName = "pdf sign")
 	public PdfSignResponse sign(PdfSignRequest pdfSignRequest) {
 		return ServerOp.call("Error signing PDF", () -> {
 			byte[] pdfBytes = Base64.getDecoder().decode(pdfSignRequest.getPdf());
@@ -114,6 +116,7 @@ public class PdfService {
 	/**
 	 * Достраивает подписанный PDF до PAdES-LT / LTA.
 	 */
+	@Observed(name = "ncanode.pdf", contextualName = "pdf extend")
 	public PdfSignResponse extend(kz.ncanode.dto.request.PdfExtendRequest request) {
 		return ServerOp.call("Error extending PDF", () -> {
 			if (!request.getPadesLevel().isAtLeast(AdesLevel.LT)) {
@@ -239,6 +242,7 @@ public class PdfService {
 	 * @param pdfVerifyRequest PDF verification request
 	 * @return PDF verification response
 	 */
+	@Observed(name = "ncanode.pdf", contextualName = "pdf verify")
 	public PdfVerificationResponse verify(PdfVerifyRequest pdfVerifyRequest) {
 		return ServerOp.call("Error verifying PDF", () -> {
 			byte[] pdfBytes = Base64.getDecoder().decode(pdfVerifyRequest.getPdf());

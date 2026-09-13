@@ -55,6 +55,12 @@ dependencies {
     implementation 'org.springframework.retry:spring-retry:2.0.12'
     providedRuntime 'org.springframework.boot:spring-boot-starter-tomcat'
 
+    // Observability -> OTLP. @Observed требует AspectJ: он приезжает из spring-aspects выше.
+    implementation 'io.micrometer:micrometer-tracing-bridge-otel'
+    implementation 'io.opentelemetry:opentelemetry-exporter-otlp'
+    testImplementation 'io.micrometer:micrometer-observation-test'
+    testImplementation 'io.micrometer:micrometer-tracing-test'
+
     // Spock/Mockito
     testImplementation 'org.apache.groovy:groovy'
     testImplementation 'org.apache.groovy:groovy-xml'

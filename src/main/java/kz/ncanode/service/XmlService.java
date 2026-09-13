@@ -1,5 +1,6 @@
 package kz.ncanode.service;
 
+import io.micrometer.observation.annotation.Observed;
 import kz.gov.pki.kalkan.tsp.TimeStampToken;
 import kz.ncanode.dto.request.SignerRequest;
 import kz.ncanode.dto.request.XmlSignRequest;
@@ -76,6 +77,7 @@ public class XmlService {
      * @param xmlSignRequest Запрос на подпись XML
      * @return Ответ с подписанным XML
      */
+    @Observed(name = "ncanode.xml", contextualName = "xml sign")
     public XmlSignResponse sign(XmlSignRequest xmlSignRequest) {
         final DocumentWrapper document = read(xmlSignRequest.getXml(), xmlSignRequest.isClearSignatures());
 
@@ -158,6 +160,7 @@ public class XmlService {
      * @param checkCrl Проверять в CRL
      * @return Результат проверки
      */
+    @Observed(name = "ncanode.xml", contextualName = "xml verify")
     public VerificationResponse verify(String xml, boolean checkOcsp, boolean checkCrl) {
         final DocumentWrapper document = read(xml, false);
         final Element root = document.getDocumentElement();

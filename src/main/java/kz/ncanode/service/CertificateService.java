@@ -1,5 +1,6 @@
 package kz.ncanode.service;
 
+import io.micrometer.observation.annotation.Observed;
 import kz.gov.pki.kalkan.jce.provider.KalkanProvider;
 import kz.ncanode.constants.MessageConstants;
 import kz.ncanode.dto.certificate.CertificateInfo;
@@ -34,6 +35,7 @@ public class CertificateService {
     public final CaService caService;
     public final KalkanWrapper kalkanWrapper;
 
+    @Observed(name = "ncanode.certificate", contextualName = "certificate validation data")
     public void attachValidationData(final CertificateWrapper cert, boolean checkOcsp, boolean checkCrl) {
         cert.setIssuerCertificate(caService.getRootCertificateFor(cert).orElse(null));
         cert.setOcspStatus(checkOcsp ? ocspService.verify(cert, cert.getIssuerCertificate()) : null);
@@ -52,6 +54,7 @@ public class CertificateService {
      * @param extraCerts  дополнительные сертификаты (например, цепочка TSA из метки времени)
      * @return материал для вшивания
      */
+    @Observed(name = "ncanode.certificate", contextualName = "ades validation data")
     public AdesValidationData collectAdesValidationData(CertificateWrapper signer, List<X509Certificate> extraCerts) {
         final List<CertificateWrapper> chain = caService.buildChain(signer);
         final List<X509Certificate> certificates = new ArrayList<>();
@@ -121,6 +124,7 @@ public class CertificateService {
         }
     }
 
+    @Observed(name = "ncanode.certificate", contextualName = "pkcs12 verify")
     public VerificationResponse verifyCerts(Pkcs12InfoRequest request) {
         var valid = true;
         val date = getCurrentDate();
@@ -148,6 +152,7 @@ public class CertificateService {
             .build();
     }
 
+    @Observed(name = "ncanode.certificate", contextualName = "certificate info")
     public VerificationResponse info(List<String> certsBase64, boolean checkOcsp, boolean checkCrl) {
         try {
             var valid = true;
@@ -194,6 +199,7 @@ public class CertificateService {
         }
     }
 
+    @Observed(name = "ncanode.certificate", contextualName = "certificate verify")
     public VerificationResponse verify(String certBase64, String signature, String data, boolean checkOcsp, boolean checkCrl) {
         try {
             var valid = true;
@@ -262,6 +268,7 @@ public class CertificateService {
         }
     }
 
+    @Observed(name = "ncanode.certificate", contextualName = "x509 sign")
     public SbaSignResponse create(SbaSignRequest sbaSignRequest) {
         return ServerOp.call(null, () -> {
             String keyBase64 = sbaSignRequest.getSigner().getKey();

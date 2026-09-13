@@ -1,5 +1,6 @@
 package kz.ncanode.service;
 
+import io.micrometer.observation.annotation.Observed;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.interfaces.Claim;
@@ -59,6 +60,7 @@ public class JwsService {
     /**
      * Создаёт новый JWS.
      */
+    @Observed(name = "ncanode.jws", contextualName = "jws sign")
     public JwsSignResponse sign(JwsSignRequest request) {
         return ServerOp.call(null, () -> {
             if (request.getPayload() == null) {
@@ -85,6 +87,7 @@ public class JwsService {
     /**
      * Добавляет подписантов в существующий JWS.
      */
+    @Observed(name = "ncanode.jws", contextualName = "jws sign add")
     public JwsSignResponse addSigners(JwsSignRequest request) {
         return ServerOp.call(null, () -> {
             JsonNode existing = request.getJws();
@@ -130,6 +133,7 @@ public class JwsService {
     /**
      * Проверяет JWS.
      */
+    @Observed(name = "ncanode.jws", contextualName = "jws verify")
     public JwsVerifyResponse verify(JwsVerifyRequest request) {
         return ServerOp.callClient(null, () -> {
             JsonNode jws = request.getJws();

@@ -1,5 +1,6 @@
 package kz.ncanode.service;
 
+import io.micrometer.observation.annotation.Observed;
 import kz.ncanode.dto.request.WsseSignRequest;
 import kz.ncanode.dto.response.VerificationResponse;
 import kz.ncanode.dto.response.XmlSignResponse;
@@ -56,6 +57,7 @@ public class WsseService {
      * @param wsseSignRequest Запрос на подпись
      * @return Подписанный SOAP-конверт
      */
+    @Observed(name = "ncanode.wsse", contextualName = "wsse sign")
     public XmlSignResponse sign(final WsseSignRequest wsseSignRequest) {
         return ServerOp.call(null, () -> {
             // read key
@@ -121,6 +123,7 @@ public class WsseService {
      * @param checkCrl Проверять в CRL
      * @return Результат проверки
      */
+    @Observed(name = "ncanode.wsse", contextualName = "wsse verify")
     public VerificationResponse verify(String xml, boolean checkOcsp, boolean checkCrl) {
         return ServerOp.call(null, () -> {
             SOAPMessage msg = MessageFactory.newInstance().createMessage(null, new ByteArrayInputStream(

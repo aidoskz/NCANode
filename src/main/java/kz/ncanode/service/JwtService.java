@@ -1,5 +1,6 @@
 package kz.ncanode.service;
 
+import io.micrometer.observation.annotation.Observed;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTCreator;
 import com.auth0.jwt.JWTVerifier;
@@ -45,6 +46,7 @@ public class JwtService {
      * @param jwtEncodeRequest Запрос на формирование и подписание JWT
      * @return Ответ с подписанным JWT
      */
+    @Observed(name = "ncanode.jwt", contextualName = "jwt encode")
     public JwtEncodeResponse encode(JwtEncodeRequest jwtEncodeRequest) {
         return ServerOp.call(null, () -> {
             final KeyStoreWrapper keystore = kalkanWrapper.read(jwtEncodeRequest.getKey(), jwtEncodeRequest.getKeyAlias(), jwtEncodeRequest.getPassword());
@@ -78,6 +80,7 @@ public class JwtService {
      * @param jwtDecodeRequest Запрос на проверку JWT
      * @return Результат проверки с декодированными данными
      */
+    @Observed(name = "ncanode.jwt", contextualName = "jwt decode")
     public JwtDecodeResponse decode(JwtDecodeRequest jwtDecodeRequest) {
         return ServerOp.callClient(null, () -> {
 

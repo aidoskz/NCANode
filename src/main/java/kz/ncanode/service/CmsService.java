@@ -1,5 +1,6 @@
 package kz.ncanode.service;
 
+import io.micrometer.observation.annotation.Observed;
 import kz.gov.pki.kalkan.asn1.DERObjectIdentifier;
 import kz.gov.pki.kalkan.asn1.DERSet;
 import kz.gov.pki.kalkan.asn1.cms.Attribute;
@@ -66,6 +67,7 @@ public class CmsService {
      * @param cmsCreateRequest
      * @return
      */
+    @Observed(name = "ncanode.cms", contextualName = "cms sign")
     public CmsResponse create(CmsCreateRequest cmsCreateRequest) {
         return ServerOp.call(null, () -> {
             CMSSignedDataGenerator generator = new CMSSignedDataGenerator();
@@ -129,6 +131,7 @@ public class CmsService {
      * @param cmsCreateRequest
      * @return
      */
+    @Observed(name = "ncanode.cms", contextualName = "cms sign add")
     public CmsResponse addSigners(CmsCreateRequest cmsCreateRequest) {
         return ServerOp.call(null, () -> {
             if (cmsCreateRequest.getCms() == null || cmsCreateRequest.getCms().isEmpty()) {
@@ -232,6 +235,7 @@ public class CmsService {
      * @param checkCrl
      * @return
      */
+    @Observed(name = "ncanode.cms", contextualName = "cms verify")
     public CmsVerificationResponse verify(String signedCms, String detachedData, boolean checkOcsp, boolean checkCrl) {
         return ServerOp.callClient(null, () -> {
             CMSSignedData cms = new CMSSignedData(Base64.getDecoder().decode(signedCms.getBytes(StandardCharsets.UTF_8)));
@@ -317,6 +321,7 @@ public class CmsService {
      * @param signedCms
      * @return
      */
+    @Observed(name = "ncanode.cms", contextualName = "cms extract")
     public CmsDataResponse extract(String signedCms) {
         return ServerOp.call(null, () -> {
             val cms = new CMSSignedData(Base64.getDecoder().decode(signedCms));
@@ -420,6 +425,7 @@ public class CmsService {
      * Достраивает готовую CAdES-подпись до профиля {@code cadesLevel} (T / LT / LTA).
      * Уже присутствующие элементы (метка времени, вшитый отзыв) не дублируются.
      */
+    @Observed(name = "ncanode.cms", contextualName = "cms extend")
     public CmsResponse extend(CmsExtendRequest request) {
         return ServerOp.call(null, () -> {
             byte[] decodedCms = Base64.getDecoder().decode(request.getCms());

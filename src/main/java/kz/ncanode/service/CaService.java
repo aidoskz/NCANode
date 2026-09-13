@@ -1,5 +1,6 @@
 package kz.ncanode.service;
 
+import io.micrometer.observation.annotation.Observed;
 import kz.ncanode.annotation.Generated;
 import kz.ncanode.configuration.CaConfiguration;
 import kz.ncanode.dto.crl.CrlResult;
@@ -130,6 +131,7 @@ public class CaService {
      * @param leaf конечный сертификат
      * @return цепочка (минимум сам {@code leaf})
      */
+    @Observed(name = "ncanode.ca", contextualName = "ca build chain")
     public List<CertificateWrapper> buildChain(CertificateWrapper leaf) {
         final List<CertificateWrapper> chain = new ArrayList<>();
         chain.add(leaf);

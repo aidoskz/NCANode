@@ -7,6 +7,9 @@ ncanode:
   system:
     detailedErrors: ${NCANODE_DEBUG:false}
     cacheDir: ${NCANODE_CACHE_DIR:./cache}
+  json:
+    # AdES-LT/LTA с вшитым боевым CRL — это ~25 МБ в одной строке JSON
+    maxStringLength: ${NCANODE_MAX_JSON_STRING_LENGTH:67108864}
   crl:
     enabled: ${NCANODE_CRL_ENABLED:true}
     ttl: ${NCANODE_CRL_TTL:1440}

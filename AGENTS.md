@@ -109,6 +109,12 @@ GOST-2015 (действующий на 2026–2027):
 **`id-aa-CMS-algorithm-protection`** — не добавляем: Kalkan-генератор (`addSigner(..., AttributeTable, ...)`)
 молча отбрасывает неизвестные signed-атрибуты, движок NCALayer выдаёт CAdES-B без него (значит, для РК не требуется).
 
+**Размер LT/LTA.** В подпись уровня LT/LTA попадает CRL издателя TSA, а боевой GOST-CRL весит 19 МБ —
+готовая подпись выходит ~25 МБ. Jackson с 2.15 не читает строки длиннее 20 000 000 символов, поэтому предел
+поднят до 64 МиБ (`NCANODE_MAX_JSON_STRING_LENGTH`, `configuration/JsonConfiguration`); значение приходит
+аргументом `@Bean`-метода, а не полем `@ConfigurationProperties` — настройщик Jackson создаётся до привязки
+свойств, и в поле был бы 0.
+
 **`/cms/extend`, `/pdf/extend`** — достройка готовой подписи до LT/LTA (`CmsExtendRequest`/`PdfExtendRequest`,
 поле `cadesLevel`/`padesLevel`). Идемпотентно: не дублирует уже вшитые метку/отзыв. Co-sign с профилем
 по-прежнему не поддержан (`/cms/sign/add` → `ClientException` с подсказкой на `/cms/extend`).

@@ -13,4 +13,7 @@ public class MessageConstants {
     public final static String KEY_CANT_EXTRACT_PRIVATE_KEY  = "Key reading error: Cannot extract private key.";
     public final static String KEY_CANT_EXTRACT_CERTIFICATE  = "Key reading error: Cannot extract certificate.";
     public final static String CERT_INVALID                  = "[%d]: Invalid certificate given.";
+
+    /* Request */
+    public final static String REQUEST_BODY_INVALID          = "Request body is malformed or larger than the configured limit.";
 }
